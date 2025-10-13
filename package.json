@@ -37,10 +37,7 @@
 		"test:watch": "jest --watch",
 		"test:cov": "jest --coverage",
 		"test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-		"test:e2e": "jest --config ./test/jest-e2e.json",
-		"docs:build": "typedoc",
-		"docs:clean": "rimraf docs",
-		"docs:serve": "npx http-server docs -o"
+		"test:e2e": "jest --config ./test/jest-e2e.json"
 	},
 	"dependencies": {
 		"full-utils": "^1.0.11"
@@ -65,7 +62,6 @@
 		"ts-loader": "^9.5.4",
 		"ts-node": "^10.9.2",
 		"tsconfig-paths": "^4.2.0",
-		"typedoc": "^0.28.14",
 		"typescript": "^5.9.2"
 	},
 	"jest": {
