@@ -1,0 +1,22 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": ["src/main.ts", "src/app.module.ts", "src/**/*.ts"],
+  "tsconfig": "tsconfig.json",
+
+  "out": "docs",
+  "name": "My NestJS API Docs",
+  "readme": "README.md",
+  "includeVersion": true,
+
+  "exclude": ["**/*.spec.ts", "**/dist/**", "**/*.js"],
+  "excludeExternals": true,
+  "excludeInternal": true,
+  "excludePrivate": true,
+  "excludeNotDocumented": false,
+
+  "categorizeByGroup": true,
+  "searchInComments": true,
+
+  "plugin": [],
+  "githubPages": false
+}
