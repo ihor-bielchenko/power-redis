@@ -10,14 +10,17 @@ import {
 	isNumPZ,
 	isBool,
 	isFunc,
-	fromJSON,
-	toBool,
-	toJSON,
+	jsonDecode,
+	jsonEncode,
+	formatToBool,
 } from 'full-utils';
 import type { 
 	IORedisLike,
 	Jsonish, 
 } from './types';
+
+type ExecTuple<T = any> = [Error | null, T];
+type ExecResult<T = any> = Array<ExecTuple<T>> | null;
 
 /**
  * PowerRedis — a lightweight abstract wrapper around a Redis client that
@@ -199,7 +202,7 @@ export abstract class PowerRedis {
 			return '';
 		}
 		try {
-			const parsed = fromJSON(value);
+			const parsed = jsonDecode(value);
 
 			if (isNum(parsed) 
 				|| isBool(parsed) 
@@ -212,7 +215,7 @@ export abstract class PowerRedis {
 		catch {
 		}
 		if (isStrBool(value)) {
-			return toBool(value);
+			return formatToBool(value);
 		}
 		return value;
 	}
@@ -236,7 +239,7 @@ export abstract class PowerRedis {
 	 */
 	toPayload(value: Jsonish): string {
 		if (isArr(value) || isObj(value)) {
-			return toJSON(value);
+			return jsonEncode(value);
 		}
 		return String(value ?? '');
 	}
@@ -291,7 +294,8 @@ export abstract class PowerRedis {
 		if (!isArrFilled(execRes)) {
 			return [];
 		}
-		const first = execRes[0]?.[1];
+		const firstTuple = execRes[0] as ExecTuple<string[] | string> | undefined;
+		const first = firstTuple?.[1];
 
 		if (isArr(first)) {
 			return Array.from(first as ReadonlyArray<string>);

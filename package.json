@@ -1,7 +1,7 @@
 {
 	"name": "power-redis",
-	"version": "1.0.0",
-	"description": "A lightweight abstraction over a Redis client for predictable Redis operations: clean keys, safe serialization, efficient bulk operations, and convenient list handling. Build your own domain logic on top (e.g., queues, visibility, retries in PowerQueue) to achieve a stable and extensible architecture.",
+	"version": "2.0.1",
+	"description": "Lightweight abstraction over a Redis client for predictable Redis operations: clean keys, safe serialization, efficient bulk operations, and convenient list handling. Build your own domain logic on top (e.g., queues, visibility, retries in PowerQueue) to achieve a stable and extensible architecture.",
 	"author": "ihor-bielchenko",
 	"license": "MIT",
 	"repository": {
@@ -12,73 +12,33 @@
 		"url": "https://github.com/ihor-bielchenko/power-redis/issues"
 	},
 	"homepage": "https://github.com/ihor-bielchenko/power-redis#readme",
-	"main": "dist/index.js",
+	"type": "module",
+	"main": "dist/index.cjs",
+	"module": "dist/index.js",
 	"types": "dist/index.d.ts",
+	"exports": {
+		".": {
+			"import": "./dist/index.js",
+			"require": "./dist/index.cjs",
+			"default": "./dist/index.js"
+		}
+	},
 	"files": [
 		"dist"
 	],
-	"keywords": [
-		"redis",
-		"wrapper",
-		"queue",
-		"json",
-		"lua",
-		"serialization"
-	],
 	"scripts": {
-		"build": "nest build",
-		"format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-		"start": "nest start",
-		"start:dev": "nest start --watch --",
-		"start:debug": "nest start --debug --watch",
-		"start:prod": "node dist/main",
-		"lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-		"test": "jest",
-		"test:watch": "jest --watch",
-		"test:cov": "jest --coverage",
-		"test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-		"test:e2e": "jest --config ./test/jest-e2e.json"
+		"build": "tsup src/index.ts --format esm,cjs --dts",
+		"clean": "rimraf dist docs"
 	},
-	"dependencies": {
-		"full-utils": "^1.0.11"
+	"engines": {
+		"node": ">=14"
 	},
 	"devDependencies": {
-		"@nestjs/cli": "^11.0.10",
-		"@nestjs/schematics": "^11.0.7",
-		"@nestjs/testing": "^11.1.6",
-		"@types/jest": "^30.0.0",
-		"@types/node": "^24.3.0",
-		"@types/supertest": "^6.0.3",
-		"@typescript-eslint/eslint-plugin": "^8.41.0",
-		"@typescript-eslint/parser": "^8.41.0",
-		"eslint": "^9.34.0",
-		"eslint-config-prettier": "^10.1.8",
-		"eslint-plugin-prettier": "^5.5.4",
-		"jest": "^30.0.5",
-		"prettier": "^3.6.2",
-		"source-map-support": "^0.5.21",
-		"supertest": "^7.1.4",
-		"ts-jest": "^29.4.1",
-		"ts-loader": "^9.5.4",
-		"ts-node": "^10.9.2",
-		"tsconfig-paths": "^4.2.0",
-		"typescript": "^5.9.2"
+		"@types/node": "^24.8.1",
+		"tsup": "^8.5.0",
+		"typescript": "^5.9.3"
 	},
-	"jest": {
-		"moduleFileExtensions": [
-			"js",
-			"json",
-			"ts"
-		],
-		"rootDir": "src",
-		"testRegex": ".*\\.spec\\.ts$",
-		"transform": {
-			"^.+\\.(t|j)s$": "ts-jest"
-		},
-		"collectCoverageFrom": [
-			"**/*.(t|j)s"
-		],
-		"coverageDirectory": "../coverage",
-		"testEnvironment": "node"
+	"dependencies": {
+		"full-utils": "^2.0.0"
 	}
 }
