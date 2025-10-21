@@ -84,11 +84,6 @@
 		"safe-redis",
 		"power-redis"
 	],
-	"devDependencies": {
-		"@types/node": "^24.8.1",
-		"tsup": "^8.5.0",
-		"typescript": "^5.9.3"
-	},
 	"dependencies": {
 		"full-utils": "^2.0.0"
 	}
