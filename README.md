@@ -1,5 +1,6 @@
-# power-redis
-### Lightweight abstraction over a Redis client for predictable Redis operations: clean keys, safe serialization, efficient bulk operations, and convenient list handling. Build your own domain logic on top (e.g., queues, visibility, retries in PowerQueue) to achieve a stable and extensible architecture.
+### PowerRedis
+Lightweight, type-safe abstraction over Redis for Node.js and TypeScript. It enforces predictable key patterns, safe JSON serialization, atomic list operations, and efficient SCAN/MGET chunking for large datasets.
+
 ## It standardizes:
 - safe key and pattern construction (strict segment validation),
 - JSON payload (de)serialization,
