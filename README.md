@@ -1,4 +1,4 @@
-### PowerRedis
+# PowerRedis
 Lightweight, type-safe abstraction over Redis for Node.js and TypeScript. It enforces predictable key patterns, safe JSON serialization, atomic list operations, and efficient SCAN/MGET chunking for large datasets.
 
 ## It standardizes:
