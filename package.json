@@ -1,7 +1,7 @@
 {
 	"name": "power-redis",
-	"version": "1.0.0",
-	"description": "A lightweight abstraction over a Redis client for predictable Redis operations: clean keys, safe serialization, efficient bulk operations, and convenient list handling. Build your own domain logic on top (e.g., queues, visibility, retries in PowerQueue) to achieve a stable and extensible architecture.",
+	"version": "2.0.1",
+	"description": "Lightweight abstraction over a Redis client for predictable Redis operations: clean keys, safe serialization, efficient bulk operations, and convenient list handling. Build your own domain logic on top (e.g., queues, visibility, retries in PowerQueue) to achieve a stable and extensible architecture.",
 	"author": "ihor-bielchenko",
 	"license": "MIT",
 	"repository": {
@@ -12,20 +12,33 @@
 		"url": "https://github.com/ihor-bielchenko/power-redis/issues"
 	},
 	"homepage": "https://github.com/ihor-bielchenko/power-redis#readme",
-	"main": "dist/index.js",
+	"type": "module",
+	"main": "dist/index.cjs",
+	"module": "dist/index.js",
 	"types": "dist/index.d.ts",
+	"exports": {
+		".": {
+			"import": "./dist/index.js",
+			"require": "./dist/index.cjs",
+			"default": "./dist/index.js"
+		}
+	},
 	"files": [
 		"dist"
 	],
-	"keywords": [
-		"redis",
-		"wrapper",
-		"queue",
-		"json",
-		"lua",
-		"serialization"
-	],
+	"scripts": {
+		"build": "tsup src/index.ts --format esm,cjs --dts",
+		"clean": "rimraf dist docs"
+	},
+	"engines": {
+		"node": ">=14"
+	},
+	"devDependencies": {
+		"@types/node": "^24.8.1",
+		"tsup": "^8.5.0",
+		"typescript": "^5.9.3"
+	},
 	"dependencies": {
-		"full-utils": "^1.0.11"
+		"full-utils": "^2.0.0"
 	}
 }

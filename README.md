@@ -1,5 +1,5 @@
 # power-redis
-### A lightweight abstraction over a Redis client for predictable Redis operations: clean keys, safe serialization, efficient bulk operations, and convenient list handling. Build your own domain logic on top (e.g., queues, visibility, retries in PowerQueue) to achieve a stable and extensible architecture.
+### Lightweight abstraction over a Redis client for predictable Redis operations: clean keys, safe serialization, efficient bulk operations, and convenient list handling. Build your own domain logic on top (e.g., queues, visibility, retries in PowerQueue) to achieve a stable and extensible architecture.
 ## It standardizes:
 - safe key and pattern construction (strict segment validation),
 - JSON payload (de)serialization,
@@ -17,6 +17,9 @@ The class is not tied to a specific client: you provide an object compatible wit
 - Different client versions handle LPOP count inconsistently.
 
 <b>power-redis</b> addresses all of this in a consistent and clean way, saving your time and reducing the number of bugs.
+
+## API (with examples)
+Below are brief excerpts. Full JSDoc: power-redis.docs.ihor.bielchenko.com.
 
 ## Fast start
 ```javascript
@@ -97,9 +100,6 @@ This approach balances load and memory usage without blocking Redis.
 - ```getList(key, limit, remove)``` and ```getListIterator```:
 	- ```remove=true``` — destructive batched reading (atomic per batch).
 	- ```remove=false``` — windowed reading by indexes (LLEN/LRANGE), not isolated from race conditions.
-
-## API (with examples)
-Below are brief excerpts. Full JSDoc: power-redis.docs.ihor.bielchenko.com.
 
 ### ```checkConnection(): boolean```
 Checks client readiness: true/false.<br />
