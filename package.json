@@ -1,6 +1,6 @@
 {
 	"name": "power-redis",
-	"version": "2.0.2",
+	"version": "2.0.3",
 	"description": "Type-safe Redis wrapper for Node.js providing predictable key schema, safe JSON serialization, atomic list ops, and chunked SCAN/MGET utilities.",
 	"author": "ihor-bielchenko",
 	"license": "MIT",
@@ -85,6 +85,6 @@
 		"power-redis"
 	],
 	"dependencies": {
-		"full-utils": "^2.0.0"
+		"full-utils": "^2.0.3"
 	}
 }
