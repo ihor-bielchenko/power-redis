@@ -1,5 +1,6 @@
 import type {
 	JsonPrimitive,
+	JsonPrimitiveOrUndefined,
 	Jsonish,
 	RedisMultiLike,
 	IORedisLike,
@@ -8,6 +9,7 @@ import { PowerRedis } from './PowerRedis';
 
 export type {
 	JsonPrimitive,
+	JsonPrimitiveOrUndefined,
 	Jsonish,
 	RedisMultiLike,
 	IORedisLike,
