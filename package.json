@@ -26,10 +26,6 @@
 	"files": [
 		"dist"
 	],
-	"scripts": {
-		"build": "tsup src/index.ts --format esm,cjs --dts",
-		"clean": "rimraf dist docs"
-	},
 	"engines": {
 		"node": ">=14"
 	},
