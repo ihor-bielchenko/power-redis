@@ -112,27 +112,4 @@ export interface IORedisLike {
 		numKeys: number,
 		...args: string[]
 	): Promise<any>;
-
-	xgroup?(
-		script: string, 
-		stream: string, 
-		group: string, 
-		from: string, 
-		mkstream: string
-	): Promise<void>;
-
-	xreadgroup?(
-		groupKey: string,
-		group: string,
-		consumer: string,
-		blockKey: string,
-		block: number,
-		countKey: string,
-		count: number,
-		streamKey: string,
-		stream: string,
-		condition: string
-	): Promise<Array<any>>;
-
-	pttl?(key: string): Promise<number>;
 }
