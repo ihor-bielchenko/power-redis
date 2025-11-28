@@ -12,6 +12,7 @@ import {
 	isFunc,
 	jsonDecode,
 	jsonEncode,
+	formatToTrim,
 	formatToBool,
 } from 'full-utils';
 import type { 
@@ -32,7 +33,7 @@ export abstract class PowerRedis {
 
 	toPatternString(...parts: Array<string | number>): string {
 		for (const p of parts) {
-			const s = String(p).trim();
+			const s = formatToTrim(p);
 
 			if (!isStrFilled(s) || s.includes(':') || /\s/.test(s)) {
 				throw new Error(`Pattern segment invalid (no ":", spaces): "${s}"`);
@@ -43,7 +44,7 @@ export abstract class PowerRedis {
 
 	toKeyString(...parts: Array<string | number>): string {
 		for (const p of parts) {
-			const s = String(p).trim();
+			const s = formatToTrim(p);
 
 			if (!isStrFilled(s) || s.includes(':') || /[\*\?\[\]\s]/.test(s)) {
 				throw new Error(`Key segment is invalid (no ":", spaces or glob chars * ? [ ] allowed): "${s}"`);
@@ -407,16 +408,21 @@ export abstract class PowerRedis {
 		throw new Error('Redis drop many error.');
 	}
 
-	async incr(key: string): Promise<number> { 
-		return (this.redis as any).incr(key); 
+	async incr(key: string, ttl?: number): Promise<number> { 
+		const result = await (this.redis as any).incr(key); 
+
+		if (isNumP(ttl)) {
+			await (this.redis as any).pexpire(key, ttl);
+		}
+		return result;
 	}
 
 	async expire(key: string, ttl: number): Promise<number> { 
-		return (this.redis as any).expire(key, ttl); 
+		return await (this.redis as any).expire(key, ttl); 
 	}
 
 	async script(subcommand: 'LOAD', script: string): Promise<string> {
-		return (this.redis as any).script('LOAD', script); 
+		return await (this.redis as any).script('LOAD', script); 
 	}
 
 	async xgroup(script: string, stream: string, group: string, from: string, mkstream: string): Promise<void> {

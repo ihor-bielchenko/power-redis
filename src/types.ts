@@ -52,7 +52,7 @@ export interface IORedisLike {
 
 	mset(...keyValues: string[]): Promise<'OK'>;
 
-	incr(key: string): Promise<number>;
+	incr(key: string, ttl?: number): Promise<number>;
 
 	llen(key: string): Promise<number>;
 
