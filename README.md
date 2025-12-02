@@ -1,13 +1,27 @@
-# PowerRedis — A Safe, Consistent, High‑Performance Redis Abstraction for Node.js Microservices
+# PowerRedis - A Safe, Consistent, High‑Performance Redis Abstraction for Node.js Microservices
 
 PowerRedis is a lightweight, reliable, and extensible abstraction layer built on top of Redis for production‑grade Node.js and TypeScript applications.  
 It provides a consistent key format system, safe serialization, predictable list operations, SCAN‑based pattern utilities, TTL helpers, and convenience methods missing from raw Redis clients.
 
 This library focuses on **stability, clarity, and real‑world microservice needs**, making Redis usage more maintainable across large distributed systems.
 
+<p align="center">
+  <img src="https://img.shields.io/badge/nodejs-queue-green?logo=node.js" />
+  <img src="https://img.shields.io/badge/typescript-ready-blue?logo=typescript" />
+  <img src="https://img.shields.io/badge/license-MIT-lightgrey" />
+  <img src="https://img.shields.io/badge/status-production-success" />
+</p>
+
 ---
 
-## Key Features & Advantages
+## 📚 Documentation
+
+Full documentation is available here:  
+👉 **https://power-redis.docs.ihor.bielchenko.com**
+
+---
+
+## 🚀 Key Features & Advantages
 
 ### ✔ Strict and Predictable Key Formatting  
 PowerRedis enforces a consistent, error‑free key style:
@@ -35,10 +49,10 @@ This prevents the classic `[object Object]` and malformed JSON issues.
 ### ✔ High‑Level List Operations (Queues, Buffers, Streams)  
 Includes utilities not found in basic Redis clients:
 
-- **lpopCountCompat** — a safe polyfill for `LPOP key count`  
-- **getListIterator** — async chunk‑based iteration over large lists  
-- **pushOne / pushMany** — with optional TTL support  
-- **getList(remove=true/false)** — consumption or read‑only mode  
+- **lpopCountCompat** - a safe polyfill for `LPOP key count`  
+- **getListIterator** - async chunk‑based iteration over large lists  
+- **pushOne / pushMany** - with optional TTL support  
+- **getList(remove=true/false)** - consumption or read‑only mode  
 
 These features are ideal for queueing, batch processing, schedulers, and background jobs.
 
@@ -47,9 +61,9 @@ These features are ideal for queueing, batch processing, schedulers, and backgro
 ### ✔ SCAN‑Based Pattern Tools (Safe Alternative to KEYS)  
 PowerRedis offers efficient mass‑operations without blocking Redis:
 
-- `keys(pattern, limit, scanSize)` — safe pattern scanning  
-- `getMany(pattern)` — batch MGET with chunking  
-- `dropMany(pattern)` — deletion via `SCAN + UNLINK`  
+- `keys(pattern, limit, scanSize)` - safe pattern scanning  
+- `getMany(pattern)` - batch MGET with chunking  
+- `dropMany(pattern)` - deletion via `SCAN + UNLINK`  
 
 Usage of `UNLINK` improves performance for large keysets.
 
@@ -63,9 +77,9 @@ Environment variable `REDIS_STRICT_CHECK_CONNECTION` enables strict or soft conn
 ---
 
 ### ✔ TTL Helpers & Semi‑Atomic Behaviors  
-- `setOne` / `setMany` — automatic TTL support  
-- `pushOne` / `pushMany` — TTL for lists  
-- `incr(key, ttl)` — counter with TTL reset  
+- `setOne` / `setMany` - automatic TTL support  
+- `pushOne` / `pushMany` - TTL for lists  
+- `incr(key, ttl)` - counter with TTL reset  
 
 These are extremely useful for rate‑limiters, counters, and expiring caches.
 
@@ -81,7 +95,7 @@ Works well alongside queue systems or event pipelines.
 
 ---
 
-## Installation
+## 📦 Installation
 
 ```bash
 npm install power-redis
@@ -95,7 +109,7 @@ yarn add power-redis
 
 ---
 
-## Basic Usage Example
+## 🧪 Basic Usage Example
 
 ```ts
 import { PowerRedis } from 'power-redis';
@@ -121,7 +135,7 @@ const redis = new MyRedis();
 
 ---
 
-## Why Not Use Raw ioredis/node‑redis?
+## 🧱 Why Not Use Raw ioredis/node‑redis?
 
 Typical Redis clients only expose low‑level commands.  
 Real‑world applications quickly accumulate duplicated logic, such as:
@@ -137,7 +151,7 @@ PowerRedis solves these problems with a clean, unified API layer that keeps your
 
 ---
 
-## Ideal Use Cases
+## 🚀 Ideal Use Cases
 
 - Node.js / TypeScript microservice ecosystems  
 - Distributed architectures  
@@ -148,7 +162,7 @@ PowerRedis solves these problems with a clean, unified API layer that keeps your
 
 ---
 
-## SEO‑Friendly Keywords (naturally integrated)
+## 🏷️ SEO‑Friendly Keywords (naturally integrated)
 
 Redis abstraction layer, Node.js Redis helper, Redis SCAN alternative,  
 Redis list utilities, Redis batch operations, high‑performance Redis wrapper,  
@@ -158,5 +172,5 @@ Redis production best practices, Redis Streams wrapper.
 
 ---
 
-## License  
+## 📜 License  
 MIT

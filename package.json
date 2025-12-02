@@ -92,6 +92,6 @@
 		"clean": "rimraf dist docs"
 	},
 	"dependencies": {
-		"full-utils": "^2.0.3"
+		"full-utils": "^2.0.5"
 	}
 }
