@@ -1,6 +1,6 @@
-# PowerRedis - A Safe, Consistent, High‑Performance Redis Abstraction for Node.js Microservices
+# power-redis - A Safe, Consistent, High‑Performance Redis Abstraction for Node.js Microservices
 
-PowerRedis is a lightweight, reliable, and extensible abstraction layer built on top of Redis for production‑grade Node.js and TypeScript applications.  
+Reliable, lightweight and extensible abstraction layer built on top of Redis for production‑grade Node.js and TypeScript applications.  
 It provides a consistent key format system, safe serialization, predictable list operations, SCAN‑based pattern utilities, TTL helpers, and convenience methods missing from raw Redis clients.
 
 This library focuses on **stability, clarity, and real‑world microservice needs**, making Redis usage more maintainable across large distributed systems.
@@ -24,7 +24,7 @@ Full documentation is available here:
 ## 🚀 Key Features & Advantages
 
 ### ✔ Strict and Predictable Key Formatting  
-PowerRedis enforces a consistent, error‑free key style:
+power-redis enforces a consistent, error‑free key style:
 - Disallows invalid characters, spaces, forbidden segments, and empty sections  
 - Prevents accidental wildcard collisions  
 - Ensures uniform key naming across services  
@@ -59,7 +59,7 @@ These features are ideal for queueing, batch processing, schedulers, and backgro
 ---
 
 ### ✔ SCAN‑Based Pattern Tools (Safe Alternative to KEYS)  
-PowerRedis offers efficient mass‑operations without blocking Redis:
+power-redis offers efficient mass‑operations without blocking Redis:
 
 - `keys(pattern, limit, scanSize)` - safe pattern scanning  
 - `getMany(pattern)` - batch MGET with chunking  
@@ -147,7 +147,7 @@ Real‑world applications quickly accumulate duplicated logic, such as:
 - TTL handling logic  
 - mismatched connection state checks  
 
-PowerRedis solves these problems with a clean, unified API layer that keeps your microservices consistent and safe.
+power-redis solves these problems with a clean, unified API layer that keeps your microservices consistent and safe.
 
 ---
 
