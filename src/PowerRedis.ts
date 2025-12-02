@@ -210,8 +210,8 @@ export abstract class PowerRedis {
 	 *
 	 * - In **non-strict mode** (any other value):
 	 *   - Returns `true` when `this.redis.status` is:
-	 *     - `"ready"` – fully connected;
-	 *     - `"connecting"` or `"reconnecting"` – connection is in progress, but we still allow commands.
+	 *     - `"ready"` - fully connected;
+	 *     - `"connecting"` or `"reconnecting"` - connection is in progress, but we still allow commands.
 	 *
 	 * If the client is missing (`this.redis` is falsy) or its status is different from
 	 * the allowed values, the method returns `false`.
@@ -647,7 +647,7 @@ export abstract class PowerRedis {
 
 	/**
 	 * Reads multiple Redis keys that match a given pattern and returns their
-	 * decoded values as a key–value object.
+	 * decoded values as a key-value object.
 	 *
 	 * This method is a high-level utility that combines:
 	 *
