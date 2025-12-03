@@ -21,7 +21,47 @@ Full documentation is available here:
 
 ---
 
-## 🚀 Key Features & Advantages
+# 📦 Installation
+
+```bash
+npm install power-redis
+```
+
+or
+
+```bash
+yarn add power-redis
+```
+
+---
+
+# 🧪 Basic Usage Example
+
+```ts
+import { PowerRedis } from 'power-redis';
+import Redis from 'ioredis';
+
+class MyRedis extends PowerRedis {
+  public redis = new Redis({ host: '127.0.0.1', port: 6379 });
+}
+
+const redis = new MyRedis();
+
+(async () => {
+  await redis.setOne(
+    redis.toKeyString('user', 1, 'profile'),
+    { name: 'Alice' },
+    3600
+  );
+
+  const user = await redis.getOne('user:1:profile');
+  console.log(user);
+})();
+```
+
+---
+
+# 🚀 Key Features & Advantages
 
 ### ✔ Strict and Predictable Key Formatting  
 power-redis enforces a consistent, error‑free key style:
@@ -95,47 +135,7 @@ Works well alongside queue systems or event pipelines.
 
 ---
 
-## 📦 Installation
-
-```bash
-npm install power-redis
-```
-
-or
-
-```bash
-yarn add power-redis
-```
-
----
-
-## 🧪 Basic Usage Example
-
-```ts
-import { PowerRedis } from 'power-redis';
-import Redis from 'ioredis';
-
-class MyRedis extends PowerRedis {
-  public redis = new Redis({ host: '127.0.0.1', port: 6379 });
-}
-
-const redis = new MyRedis();
-
-(async () => {
-  await redis.setOne(
-    redis.toKeyString('user', 1, 'profile'),
-    { name: 'Alice' },
-    3600
-  );
-
-  const user = await redis.getOne('user:1:profile');
-  console.log(user);
-})();
-```
-
----
-
-## 🧱 Why Not Use Raw ioredis/node‑redis?
+# 🧱 Why Not Use Raw ioredis/node‑redis?
 
 Typical Redis clients only expose low‑level commands.  
 Real‑world applications quickly accumulate duplicated logic, such as:
@@ -151,7 +151,7 @@ power-redis solves these problems with a clean, unified API layer that keeps you
 
 ---
 
-## 🚀 Ideal Use Cases
+# 🚀 Ideal Use Cases
 
 - Node.js / TypeScript microservice ecosystems  
 - Distributed architectures  
