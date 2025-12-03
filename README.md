@@ -1,9 +1,10 @@
-# power-redis - A Safe, Consistent, High‑Performance Redis Abstraction for Node.js Microservices
+# power-redis
 
-Reliable, lightweight and extensible abstraction layer built on top of Redis for production‑grade Node.js and TypeScript applications.  
-It provides a consistent key format system, safe serialization, predictable list operations, SCAN‑based pattern utilities, TTL helpers, and convenience methods missing from raw Redis clients.
+## A safe, high-performance, multifunctional, and extensible Redis abstraction for Node.js.
 
-This library focuses on **stability, clarity, and real‑world microservice needs**, making Redis usage more maintainable across large distributed systems.
+It provides a set of advanced Redis operations that are not available in standard clients, including consistent key-formatting utilities, safe serialization, bulk operations, and more.
+
+This library is built with a focus on stability, clarity, and real-world application needs, making Redis usage more maintainable and convenient in large distributed systems.
 
 <p align="center">
   <img src="https://img.shields.io/badge/nodejs-queue-green?logo=node.js" />
@@ -12,16 +13,12 @@ This library focuses on **stability, clarity, and real‑world microservice need
   <img src="https://img.shields.io/badge/status-production-success" />
 </p>
 
----
-
 ## 📚 Documentation
 
 Full documentation is available here:  
 👉 **https://power-redis.docs.ihor.bielchenko.com**
 
----
-
-# 📦 Installation
+## 📦 Installation
 
 ```bash
 npm install power-redis
@@ -33,99 +30,88 @@ or
 yarn add power-redis
 ```
 
----
-
-# 🧪 Basic Usage Example
+## 🧪 Basic usage
 
 ```ts
 import { PowerRedis } from 'power-redis';
 import Redis from 'ioredis';
 
 class MyRedis extends PowerRedis {
-  public redis = new Redis({ host: '127.0.0.1', port: 6379 });
+	public redis = new Redis({ host: '127.0.0.1', port: 6379 });
 }
 
 const redis = new MyRedis();
 
 (async () => {
-  await redis.setOne(
-    redis.toKeyString('user', 1, 'profile'),
-    { name: 'Alice' },
-    3600
-  );
+	await redis.setMany([
+		{ 
+			key: 'key1', 
+			value: 'value 1' 
+		},
+		{ 
+			key: 'key2', 
+			value: 'value 2' 
+		}
+	], 3600);
 
-  const user = await redis.getOne('user:1:profile');
-  console.log(user);
+	const keys = await redis.keys('key_prefix:1:*');    // [ "key_prefix:1:key1", "key_prefix:1:key2" ]
+	const data = await redis.getMany('key_prefix:1:*'); // [{ key1: "value 1" }, { key2: "value 2" }]
 })();
 ```
 
----
+## 🚀 Key Features & Advantages
 
-# 🚀 Key Features & Advantages
-
-### ✔ Strict and Predictable Key Formatting  
-power-redis enforces a consistent, error‑free key style:
-- Disallows invalid characters, spaces, forbidden segments, and empty sections  
-- Prevents accidental wildcard collisions  
-- Ensures uniform key naming across services  
+### ✔ Strict and Predictable Key Formatting
+**power-redis** enforces a consistent, error‑free key style:
+- Disallows invalid characters, spaces, forbidden segments, and empty sections
+- Prevents accidental wildcard collisions
+- Ensures uniform key naming across services
 
 This dramatically reduces debugging time in multi‑team and multi‑service environments.
 
----
-
-### ✔ Safe and Reliable Payload Serialization  
+### ✔ Safe and Reliable Payload Serialization
 Built‑in helpers (`toPayload`, `fromPayload`) handle:
-- JSON objects  
-- Arrays  
-- Numeric and boolean primitives  
-- String boolean formats (`"yes"`, `"no"`, `"true"`, `"false"`)  
-- Empty strings  
-- Graceful fallbacks  
+- JSON objects
+- Arrays
+- Numeric and boolean primitives
+- String boolean formats (`"yes"`, `"no"`, `"true"`, `"false"`)
+- Empty strings
+- Graceful fallbacks
 
 This prevents the classic `[object Object]` and malformed JSON issues.
 
----
-
-### ✔ High‑Level List Operations (Queues, Buffers, Streams)  
+### ✔ High‑Level List Operations (Queues, Buffers, Streams)
 Includes utilities not found in basic Redis clients:
 
-- **lpopCountCompat** - a safe polyfill for `LPOP key count`  
-- **getListIterator** - async chunk‑based iteration over large lists  
-- **pushOne / pushMany** - with optional TTL support  
-- **getList(remove=true/false)** - consumption or read‑only mode  
+- **lpopCountCompat** - a safe polyfill for `LPOP key count`
+- **getListIterator** - async chunk‑based iteration over large lists
+- **pushOne / pushMany** - with optional TTL support
+- **getList(remove=true/false)** - consumption or read‑only mode
 
 These features are ideal for queueing, batch processing, schedulers, and background jobs.
 
----
+### ✔ SCAN‑Based Pattern Tools (Safe Alternative to KEYS)
+**power-redis** offers efficient mass‑operations without blocking Redis:
 
-### ✔ SCAN‑Based Pattern Tools (Safe Alternative to KEYS)  
-power-redis offers efficient mass‑operations without blocking Redis:
-
-- `keys(pattern, limit, scanSize)` - safe pattern scanning  
-- `getMany(pattern)` - batch MGET with chunking  
-- `dropMany(pattern)` - deletion via `SCAN + UNLINK`  
+- `keys(pattern, limit, scanSize)` - safe pattern scanning
+- `getMany(pattern)` - batch MGET with chunking
+- `dropMany(pattern)` - deletion via `SCAN + UNLINK`
 
 Usage of `UNLINK` improves performance for large keysets.
 
----
-
-### ✔ Connection Safety Built In  
+### ✔ Connection Safety Built In
 `checkConnection()` ensures Redis is ready before any command is executed.
 
 Environment variable `REDIS_STRICT_CHECK_CONNECTION` enables strict or soft connection modes.
 
----
-
-### ✔ TTL Helpers & Semi‑Atomic Behaviors  
-- `setOne` / `setMany` - automatic TTL support  
-- `pushOne` / `pushMany` - TTL for lists  
-- `incr(key, ttl)` - counter with TTL reset  
+### ✔ TTL Helpers & Semi‑Atomic Behaviors
+- `setOne` / `setMany` - automatic TTL support
+- `pushOne` / `pushMany` - TTL for lists
+- `incr(key, ttl)` - counter with TTL reset
 
 These are extremely useful for rate‑limiters, counters, and expiring caches.
 
----
-
-### ✔ Redis Streams Support  
+### ✔ Redis Streams Support
 Convenience wrappers for:
 - `XGROUP`
 - `XREADGROUP`
@@ -133,44 +119,28 @@ Convenience wrappers for:
 
 Works well alongside queue systems or event pipelines.
 
----
+## 🧱 Why Not Use Raw ioredis/node‑redis?
 
-# 🧱 Why Not Use Raw ioredis/node‑redis?
-
-Typical Redis clients only expose low‑level commands.  
+Typical Redis clients only expose low‑level commands.
 Real‑world applications quickly accumulate duplicated logic, such as:
 
-- inconsistent key naming  
-- unsafe SCAN/KEYS usage  
-- repeated JSON encode/decode  
-- list pagination boilerplate  
-- TTL handling logic  
-- mismatched connection state checks  
+- inconsistent key naming
+- unsafe SCAN/KEYS usage
+- repeated JSON encode/decode
+- list pagination boilerplate
+- TTL handling logic
+- mismatched connection state checks
 
-power-redis solves these problems with a clean, unified API layer that keeps your microservices consistent and safe.
+**power-redis** solves these problems with a clean, unified API layer that keeps your microservices consistent and safe.
 
----
+## 🏗️ Ideal Use Cases
 
-# 🚀 Ideal Use Cases
-
-- Node.js / TypeScript microservice ecosystems  
-- Distributed architectures  
-- High‑volume Redis workloads  
-- Queueing and background processing  
-- Monitoring, tracking, real‑time data pipelines  
-- Systems requiring predictable Redis key structure  
-
----
-
-## 🏷️ SEO‑Friendly Keywords (naturally integrated)
-
-Redis abstraction layer, Node.js Redis helper, Redis SCAN alternative,  
-Redis list utilities, Redis batch operations, high‑performance Redis wrapper,  
-safe Redis key builder, Redis TTL manager, Redis queue helper,  
-Redis JSON serialization, Redis UNLINK vs DEL, Redis microservice architecture,  
-Redis production best practices, Redis Streams wrapper.
-
----
+- Node.js / TypeScript microservice ecosystems
+- Distributed architectures
+- High‑volume Redis workloads
+- Queueing and background processing
+- Monitoring, tracking, real‑time data pipelines
+- Systems requiring predictable Redis key structure
 
 ## 📜 License  
-MIT
+MIT - free for commercial and private use.
