@@ -113,3 +113,17 @@ export interface IORedisLike {
 		...args: string[]
 	): Promise<any>;
 }
+
+export interface Lock {
+	ttlMs: number;
+	retries?: number; 
+	minDelayMs?: number; 
+	maxDelayMs?: number;
+}
+
+export interface DistLock { 
+	key: string;
+	token: string;
+	ttlMs: number;
+	unlock: () => Promise<boolean>;
+}
