@@ -1,6 +1,6 @@
 {
 	"name": "power-redis",
-	"version": "2.0.10",
+	"version": "2.0.11",
 	"description": "Production-grade Redis abstraction for Node.js with strict key formatting, safe JSON serialization, advanced list/queue operations, SCAN-based pattern tools, TTL helpers, batch UNLINK deletion, and Redis Streams support. Perfect for high-load microservices and distributed systems.",
 	"author": "ihor-bielchenko",
 	"license": "MIT",
@@ -90,6 +90,6 @@
 		"typescript": "^5.9.3"
 	},
 	"dependencies": {
-		"full-utils": "^2.0.5"
+		"full-utils": "^3.0.2"
 	}
 }

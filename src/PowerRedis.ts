@@ -1,3 +1,4 @@
+import * as crypto from 'crypto';
 import {
 	isStrFilled,
 	isStr,
@@ -12,16 +13,27 @@ import {
 	isFunc,
 	jsonDecode,
 	jsonEncode,
-	formatToTrim,
-	formatToBool,
+	strTrim,
+	boolNormalize,
+	wait,
 } from 'full-utils';
 import type { 
 	IORedisLike,
 	Jsonish, 
+	Lock,
+	DistLock,
 } from './types';
 
 type ExecTuple<T = any> = [Error | null, T];
 type ExecResult<T = any> = Array<ExecTuple<T>> | null;
+
+const UNLOCK_LUA = `
+	if redis.call("GET", KEYS[1]) == ARGV[1] then
+		return redis.call("DEL", KEYS[1])
+	else
+		return 0
+	end
+`;
 
 export abstract class PowerRedis {
 	public readonly isStrictCheckConnection: boolean = [ 'true', 'on', 'yes', 'y', '1' ].includes(String(process.env.REDIS_STRICT_CHECK_CONNECTION ?? '').trim().toLowerCase());
@@ -33,7 +45,7 @@ export abstract class PowerRedis {
 
 	toPatternString(...parts: Array<string | number>): string {
 		for (const p of parts) {
-			const s = formatToTrim(p);
+			const s = strTrim(p);
 
 			if (!isStrFilled(s) || s.includes(':') || /\s/.test(s)) {
 				throw new Error(`Pattern segment invalid (no ":", spaces): "${s}"`);
@@ -44,7 +56,7 @@ export abstract class PowerRedis {
 
 	toKeyString(...parts: Array<string | number>): string {
 		for (const p of parts) {
-			const s = formatToTrim(p);
+			const s = strTrim(p);
 
 			if (!isStrFilled(s) || s.includes(':') || /[\*\?\[\]\s]/.test(s)) {
 				throw new Error(`Key segment is invalid (no ":", spaces or glob chars * ? [ ] allowed): "${s}"`);
@@ -78,7 +90,7 @@ export abstract class PowerRedis {
 		catch {
 		}
 		if (isStrBool(value)) {
-			return formatToBool(value);
+			return boolNormalize(value);
 		}
 		return value;
 	}
@@ -253,26 +265,26 @@ export abstract class PowerRedis {
 		}
 	}
 
-	async setOne(key: string, value: any, ttlSec?: number): Promise<'OK'> {
+	async setOne(key: string, value: any, ttlMs?: number): Promise<'OK'> {
 		if (!isStrFilled(key)) {
 			throw new Error('Key format error.');
 		}
 		if (!this.checkConnection()) {
 			throw new Error('Redis connection error.');
 		}
-		return isNumP(ttlSec)
-			? await (this.redis as any).set(key, this.toPayload(value), 'EX', ttlSec)
+		return isNumP(ttlMs)
+			? await (this.redis as any).set(key, this.toPayload(value), 'PX', ttlMs)
 			: await (this.redis as any).set(key, this.toPayload(value));
 	}
 
-	async setMany(values: Array<{ key: string; value: any; }>, ttlSec?: number): Promise<number> {
+	async setMany(values: Array<{ key: string; value: any; }>, ttlMs?: number): Promise<number> {
 		if (!isArrFilled(values)) {
 			throw new Error('Payload format error.');
 		}
 		if (!this.checkConnection()) {
 			throw new Error('Redis connection error.');
 		}
-		if (!isNumP(ttlSec)) {
+		if (!isNumP(ttlMs)) {
 			const kv: string[] = [];
 
 			for (const { key, value } of values) {
@@ -293,7 +305,7 @@ export abstract class PowerRedis {
 			if (!isStrFilled(key)) {
 				throw new Error('Key format error.');
 			}
-			tx.set(key, this.toPayload(value), 'EX', ttlSec);
+			tx.set(key, this.toPayload(value), 'PX', ttlMs);
 		}
 		const res = await tx.exec();
 
@@ -315,18 +327,18 @@ export abstract class PowerRedis {
 		return ok;
 	}
 
-	async pushOne(key: string, value: any, ttlSec?: number): Promise<number> {
+	async pushOne(key: string, value: any, ttlMs?: number): Promise<number> {
 		if (!isStrFilled(key)) {
 			throw new Error('Key format error.');
 		}
 		if (!this.checkConnection()) {
 			throw new Error('Redis connection error.');
 		}
-		if (isNumP(ttlSec)) {
+		if (isNumP(ttlMs)) {
 			const tx = (this.redis as any).multi();
 				
 			tx.rpush(key, this.toPayload(value));
-			tx.expire(key, ttlSec);
+			tx.pexpire(key, ttlMs);
 
 			const res = await tx.exec();
 
@@ -342,7 +354,7 @@ export abstract class PowerRedis {
 		return await (this.redis as any).rpush(key, this.toPayload(value));
 	}
 
-	async pushMany(key: string, values: Array<any>, ttlSec?: number): Promise<number> {
+	async pushMany(key: string, values: Array<any>, ttlMs?: number): Promise<number> {
 		if (!isStrFilled(key)) {
 			throw new Error('Key format error.');
 		}
@@ -352,11 +364,11 @@ export abstract class PowerRedis {
 		if (!this.checkConnection()) {
 			throw new Error('Redis connection error.');
 		}
-		if (isNumP(ttlSec)) {
+		if (isNumP(ttlMs)) {
 			const tx = (this.redis as any).multi();
 			
 			tx.rpush(key, ...values.map((value) => this.toPayload(value)));
-			tx.expire(key, ttlSec);
+			tx.pexpire(key, ttlMs);
 
 			const res = await tx.exec();
 
@@ -406,6 +418,42 @@ export abstract class PowerRedis {
 		catch (err) {
 		}
 		throw new Error('Redis drop many error.');
+	}
+
+	async lock(key: string, opts?: Lock): Promise<DistLock | null> {
+		if (!this.checkConnection()) {
+			throw new Error('Redis connection error.');
+		}
+		const token = crypto.randomBytes(16).toString('hex');
+		const retries = Math.max(0, opts?.retries ?? 5);
+		const minDelay = Math.max(5, opts?.minDelayMs ?? 20);
+		const maxDelay = Math.max(minDelay, opts?.maxDelayMs ?? 60);
+		const ttlMs = Number(opts?.ttlMs ?? 3000);
+		const lockKey = this.toKeyString('lock', key);
+		let attempt = 0;
+
+		while (attempt < retries) {
+			const ok = await (this.redis as any).set(lockKey, token, 'PX', ttlMs, 'NX');
+			
+			if (ok === 'OK') {
+				return { 
+					key: lockKey, 
+					token, 
+					ttlMs, 
+					unlock: async () => await this.unlock(lockKey, token),
+				};
+			}
+			attempt++;
+
+			if (attempt < retries) {
+				await wait(minDelay + Math.floor(Math.random() * (maxDelay - minDelay + 1)));
+			}
+		}
+		return null;
+	}
+
+	async unlock(key: string, token: string): Promise<boolean> {
+		return Number(await (this.redis as any).eval(UNLOCK_LUA, 1, key, token)) === 1;
 	}
 
 	async incr(key: string, ttl?: number): Promise<number> { 
