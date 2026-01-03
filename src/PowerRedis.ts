@@ -11,8 +11,6 @@ import {
 	isNumPZ,
 	isBool,
 	isFunc,
-	jsonDecode,
-	jsonEncode,
 	strTrim,
 	boolNormalize,
 	wait,
@@ -24,7 +22,7 @@ import type {
 	DistLock,
 } from './types';
 
-type ExecTuple<T = any> = [Error | null, T];
+type ExecTuple<T = any> = [ Error | null, T ];
 type ExecResult<T = any> = Array<ExecTuple<T>> | null;
 
 const UNLOCK_LUA = `
@@ -77,14 +75,14 @@ export abstract class PowerRedis {
 			return '';
 		}
 		try {
-			const parsed = jsonDecode(value);
+			const parsed = JSON.parse(value);
 
 			if (isNum(parsed) 
 				|| isBool(parsed) 
 				|| isStr(parsed)
 				|| isArr(parsed) 
 				|| isObj(parsed)) {
-				return parsed;
+				return parsed as Jsonish;
 			}
 		}
 		catch {
@@ -97,7 +95,7 @@ export abstract class PowerRedis {
 
 	toPayload(value: Jsonish): string {
 		if (isArr(value) || isObj(value)) {
-			return jsonEncode(value);
+			return JSON.stringify(value);
 		}
 		return String(value ?? '');
 	}
