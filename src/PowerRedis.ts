@@ -45,7 +45,7 @@ export abstract class PowerRedis {
 		if (!this.redis) {
 			return false;
 		}
-		if (this.redis.status === 'ready' || this.redis.status === 'connecting') {
+		if (this.redis.status === 'ready') {
 			return true;
 		}
 		if (this.redis.status === 'connect' || this.redis.status === 'reconnecting') {
