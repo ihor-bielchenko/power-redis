@@ -32,7 +32,7 @@ export interface RedisMultiLike {
 }
 
 export interface IORedisLike {
-	status: 'ready' | 'connecting' | 'reconnecting' | string;
+	status: 'ready' | 'connect' | 'connecting' | 'reconnecting' | string;
 
 	scan(
 		cursor: string,
@@ -112,6 +112,8 @@ export interface IORedisLike {
 		numKeys: number,
 		...args: string[]
 	): Promise<any>;
+
+	connect(): Promise<any>;
 }
 
 export interface Lock {

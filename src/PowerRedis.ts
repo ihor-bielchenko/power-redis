@@ -13,7 +13,6 @@ import {
 	isFunc,
 	strTrim,
 	boolNormalize,
-	wait,
 } from 'full-utils';
 import type { 
 	IORedisLike,
@@ -33,12 +32,41 @@ const UNLOCK_LUA = `
 	end
 `;
 
-export abstract class PowerRedis {
-	public readonly isStrictCheckConnection: boolean = [ 'true', 'on', 'yes', 'y', '1' ].includes(String(process.env.REDIS_STRICT_CHECK_CONNECTION ?? '').trim().toLowerCase());
-	public abstract redis: IORedisLike;
+export async function wait(timeout: number = 0) {
+	await (new Promise((resolve) => setTimeout(() => resolve(true), timeout)));
+}
 
-	checkConnection(): boolean {
-		return !!this.redis && ((this.redis as any).status === 'ready' || (this.isStrictCheckConnection ? false : ((this.redis as any).status === 'connecting' || (this.redis as any).status === 'reconnecting')));
+export abstract class PowerRedis {
+	public readonly autoReconnect: boolean = [ 'true', 'on', 'yes', 'y', '1' ].includes(String(process.env.REDIS_AUTO_RECONNECT ?? '').trim().toLowerCase());
+	public abstract redis: IORedisLike;
+	private connecting = false;
+
+	async checkConnection(): Promise<boolean> {
+		if (!this.redis) {
+			return false;
+		}
+		if (this.redis.status === 'ready' || this.redis.status === 'connecting') {
+			return true;
+		}
+		if (this.redis.status === 'connect' || this.redis.status === 'reconnecting') {
+			return false;
+		}
+		if (this.connecting) {
+			return false;
+		}
+		this.connecting = true;
+
+		try {
+			await this.redis.connect();
+
+			return true;
+		}
+		catch (err) {
+			return false;
+		}
+		finally {
+			this.connecting = false;
+		}
 	}
 
 	toPatternString(...parts: Array<string | number>): string {
@@ -146,7 +174,7 @@ export abstract class PowerRedis {
 		if (!isNumP(scanSize)) {
 			throw new Error('Size format error.');
 		}
-		if (!this.checkConnection()) {
+		if (!await this.checkConnection()) {
 			throw new Error('Redis connection error.');
 		}
 		const keys: Set<string> = new Set();
@@ -175,7 +203,7 @@ export abstract class PowerRedis {
 		if (!isStrFilled(key)) {
 			throw new Error('Key format error.');
 		}
-		if (!this.checkConnection()) {
+		if (!await this.checkConnection()) {
 			throw new Error('Redis connection error.');
 		}
 		return this.fromPayload(await (this.redis as any).get(key));
@@ -218,11 +246,11 @@ export abstract class PowerRedis {
 	}
 
 	async *getListIterator(key: string, limit: number = 100, remove: boolean = false): AsyncGenerator<Jsonish[], void, unknown> {
-		if (!this.checkConnection()) {
+		if (!await this.checkConnection()) {
 			throw new Error('Redis connection error.');
 		}
 		if (!isStrFilled(key)) {
-					throw new Error('Key format error.');
+			throw new Error('Key format error.');
 		}
 		if (!isNumP(limit)) {
 			throw new Error('Limit format error.');
@@ -267,7 +295,7 @@ export abstract class PowerRedis {
 		if (!isStrFilled(key)) {
 			throw new Error('Key format error.');
 		}
-		if (!this.checkConnection()) {
+		if (!await this.checkConnection()) {
 			throw new Error('Redis connection error.');
 		}
 		return isNumP(ttlMs)
@@ -279,7 +307,7 @@ export abstract class PowerRedis {
 		if (!isArrFilled(values)) {
 			throw new Error('Payload format error.');
 		}
-		if (!this.checkConnection()) {
+		if (!await this.checkConnection()) {
 			throw new Error('Redis connection error.');
 		}
 		if (!isNumP(ttlMs)) {
@@ -329,7 +357,7 @@ export abstract class PowerRedis {
 		if (!isStrFilled(key)) {
 			throw new Error('Key format error.');
 		}
-		if (!this.checkConnection()) {
+		if (!await this.checkConnection()) {
 			throw new Error('Redis connection error.');
 		}
 		if (isNumP(ttlMs)) {
@@ -359,7 +387,7 @@ export abstract class PowerRedis {
 		if (!isArrFilled(values)) {
 			throw new Error('Payload format error.');
 		}
-		if (!this.checkConnection()) {
+		if (!await this.checkConnection()) {
 			throw new Error('Redis connection error.');
 		}
 		if (isNumP(ttlMs)) {
@@ -386,7 +414,7 @@ export abstract class PowerRedis {
 	}
 
 	async dropMany(pattern: string, size: number = 1000): Promise<number> {
-		if (!this.checkConnection()) {
+		if (!await this.checkConnection()) {
 			throw new Error('Redis connection error.');
 		}
 		try {
@@ -419,7 +447,7 @@ export abstract class PowerRedis {
 	}
 
 	async lock(key: string, opts?: Lock): Promise<DistLock | null> {
-		if (!this.checkConnection()) {
+		if (!await this.checkConnection()) {
 			throw new Error('Redis connection error.');
 		}
 		const token = crypto.randomBytes(16).toString('hex');
